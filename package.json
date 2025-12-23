@@ -5,12 +5,20 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "start:pm2": "pm2 start ecosystem.config.js",
+    "stop:pm2": "pm2 stop whatsapp-bot",
+    "restart:pm2": "pm2 restart whatsapp-bot",
+    "logs:pm2": "pm2 logs whatsapp-bot",
     "test": "node tests/test_bot.js",
     "test:humanization": "node tests/test_humanization.js",
     "test:onboarding": "node tests/test_onboarding.js",
     "test:strategy": "node tests/test_strategy.js",
     "test:e2e": "node tests/test_end_to_end.js",
-    "test:all": "node tests/test_bot.js && node tests/test_humanization.js && node tests/test_onboarding.js"
+    "test:enhanced": "node tests/test_enhanced_architecture.js",
+    "test:all": "node tests/test_bot.js && node tests/test_humanization.js && node tests/test_onboarding.js",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
   },
   "keywords": [
     "whatsapp",
