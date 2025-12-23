@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { handleMessage } = require('./src/commandDispatcher');
+const { handleMessage } = require('../src/commandDispatcher');
 
 // Mock objects for WhatsApp Web.js
 const createMockChat = () => ({

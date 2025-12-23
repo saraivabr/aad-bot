@@ -1,71 +1,390 @@
-# WhatsApp AI Assistant Template 🤖
+# AAD - AI Assistant for WhatsApp
 
-Este é um template profissional para bots de WhatsApp humanizados com memória persistente, utilizando a "Doug System" philosophy.
+<div align="center">
 
-## ✨ Funcionalidades
+🤖 **WhatsApp Bot com Inteligência Conversacional Avançada**
 
-- **Humanização Extrema**: Delay de resposta natural (5s) e remoção de "digitando..." instantâneo para evitar comportamento robótico.
-- **Memória Semântica**: Capaz de extrair e lembrar Nome, Negócio e Localização do usuário usando IA e Regex sensível ao contexto.
-- **Persistent Save**: Tag `||SAVE||` para salvar metadados do usuário em tempo real.
-- **Multi-Modal**: Suporte para áudio, imagem e texto.
-- **Infrastructure Ready**: Docker Compose para MongoDB, Redis e Postgres incluído.
-- **Deployment**: Configurado para rodar via PM2 em servidores Linux (Ubuntu).
+[![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
+[![WhatsApp](https://img.shields.io/badge/WhatsApp-Web.js-25D366.svg)](https://github.com/pedroslopez/whatsapp-web.js)
+[![AI Powered](https://img.shields.io/badge/AI-Powered-blue.svg)](https://github.com/langchain-ai/langchainjs)
 
-## 🚀 Como Começar (Local)
+</div>
 
-1.  **Clone o repositório**:
-    ```bash
-    git clone https://github.com/saraivabr/aad-bot.git
-    cd aad-bot
-    ```
+## 📋 Índice
 
-2.  **Instale as dependências**:
-    ```bash
-    npm install
-    ```
+- [Sobre](#sobre)
+- [Features](#features)
+- [Arquitetura](#arquitetura)
+- [Instalação](#instalação)
+- [Configuração](#configuração)
+- [Uso](#uso)
+- [Testes](#testes)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Documentação Adicional](#documentação-adicional)
+- [Tecnologias](#tecnologias)
 
-3.  **Configure o `.env`**:
-    Crie um arquivo `.env` na raiz:
-    ```env
-    OPENAI_API_KEY=sua_chave
-    OPENROUTER_API_KEY=sua_chave_opcional
-    ```
+## 🎯 Sobre
 
-4.  **Inicie os Bancos de Dados (Opcional)**:
-    ```bash
-    docker-compose up -d
-    ```
+AAD é um bot inteligente para WhatsApp com capacidades avançadas de conversação, memória semântica, detecção de intenções, inteligência emocional e sistema multi-persona. O bot utiliza arquitetura dual-mode (v2.0 + legacy) com processamento de linguagem natural, geração de mídia e respostas humanizadas adaptativas.
 
-5.  **Rode o Bot**:
-    ```bash
-    node index.js
-    ```
-    Escaneie o QR Code que aparecerá no terminal.
+### Principais Características
 
-## 📦 Deployment (Servidor)
+- **🧠 Inteligência Conversacional**: Engine avançado com StateGraph para gerenciamento de contexto
+- **💭 Memória Semântica**: Sistema de memória de longo prazo com embeddings e similaridade vetorial
+- **😊 Inteligência Emocional**: Detecção e análise de emoções com modelo valence/arousal
+- **🎭 Sistema Multi-Persona**: Blend dinâmico entre personas (Social Media e Consultant)
+- **🎤 Processamento de Voz**: Transcrição, análise emocional e síntese de voz (TTS)
+- **🖼️ Geração de Mídia**: Criação de imagens e áudio com IA
+- **📊 RAG (Retrieval-Augmented Generation)**: Base de conhecimento com busca vetorial
+- **⏱️ Respostas Humanizadas**: Timing adaptativo e fragmentação natural de mensagens
 
-Para rodar em um VPS Ubuntu com PM2:
+## ✨ Features
 
-1.  Garanta que o Chrome/Puppeteer tenha as dependências instaladas:
-    ```bash
-    sudo apt-get update && sudo apt-get install -y google-chrome-stable
-    ```
+### v2.0 - Motor Conversacional (Padrão)
 
-2.  Inicie com PM2:
-    ```bash
-    pm2 start index.js --name meu-bot
-    pm2 save
-    ```
+- **Classificador de Intenções**: Detecção baseada em padrões com scores de confiança para 13+ intenções
+- **Intenções Compostas**: Detecção multi-sinal (ready_to_buy, needs_nurturing, highly_engaged)
+- **Análise Emocional**: 9 emoções rastreadas (excited, happy, grateful, frustrated, sad, confused, anxious, curious, neutral)
+- **Memória Semântica**: 4 tipos de memória (EPISODIC, SEMANTIC, PROCEDURAL, EMOTIONAL)
+- **Message Buffer**: Timeout de 3.5s para combinar mensagens rápidas
+- **Response Formatter**: Auto-fragmentação com timing humanizado
 
-## 🧠 Personalização
+### Sistema Legacy (Fallback)
 
-Para trocar a personalidade do bot, edite o arquivo:
-`src/personas.js`
+- **FSM (Finite State Machine)**: Estados conversacionais (GREETING → DISCOVERY → ENGAGEMENT → PITCH → CLOSE)
+- **RAG com Vetores**: Base de conhecimento com embeddings
+- **Sistema de Reações**: Detecção automática de contexto para reações do WhatsApp
 
-Altere a constante `SOCIAL_MEDIA_MISSION` para mudar o objetivo da IA.
+### Features Compartilhadas
+
+- **Sistema de Tags Especiais**: Controle de ações (||SAVE||, ||GENERATE_IMAGE||, ||SEND_AUDIO||, <REACT:emoji>, <SPLIT>)
+- **Voice Intelligence**: Transcrição Whisper + análise emocional + TTS com 6 vozes
+- **Client Service**: Persistência de dados de clientes
+- **Suporte a Mídia**: Processamento de áudio, imagens e stickers
+
+## 🏗️ Arquitetura
+
+### Fluxo v2.0 (Padrão)
+
+```
+WhatsApp Message
+    ↓
+commandDispatcher (buffer + routing)
+    ↓
+conversationOrchestrator (semantic memory retrieval)
+    ↓
+conversationalEngine (StateGraph: intent + emotion + LLM)
+    ↓
+conversationOrchestrator (response formatting + execution)
+    ↓
+WhatsApp Response
+```
+
+### Fluxo Legacy (Fallback)
+
+```
+WhatsApp Message
+    ↓
+commandDispatcher (routing + FSM update)
+    ↓
+aiService (RAG + generation)
+    ↓
+commandDispatcher (humanized delivery)
+    ↓
+WhatsApp Response
+```
+
+### Estrutura de Camadas
+
+```
+┌─────────────────────────────────────────┐
+│     WhatsApp Web.js Interface           │
+│            (index.js)                    │
+└──────────────┬──────────────────────────┘
+               ↓
+┌─────────────────────────────────────────┐
+│     Command Dispatcher                   │
+│  (routing, buffering, humanization)      │
+└──────────────┬──────────────────────────┘
+               ↓
+     ┌─────────┴─────────┐
+     ↓                   ↓
+┌──────────────┐  ┌──────────────┐
+│  v2.0 Engine │  │Legacy System │
+│ (orchestrator)│  │  (aiService) │
+└──────┬───────┘  └──────┬───────┘
+       ↓                  ↓
+┌──────────────────────────────────┐
+│   Services Layer                  │
+│ • Voice Intelligence              │
+│ • Media Service                   │
+│ • Client Service                  │
+│ • Semantic Memory                 │
+└───────────────────────────────────┘
+```
+
+## 📦 Instalação
+
+### Pré-requisitos
+
+- Node.js 20+ 
+- NPM 10+
+- Conta Google Cloud (para APIs de IA)
+- Conta OpenAI (para GPT e Whisper)
+
+### Passos
+
+1. **Clone o repositório**
+```bash
+git clone https://github.com/saraivabr/aad-bot.git
+cd aad-bot
+```
+
+2. **Instale as dependências**
+```bash
+npm install
+```
+
+3. **Configure as variáveis de ambiente** (veja seção [Configuração](#configuração))
+
+4. **Execute o bot**
+```bash
+node index.js
+```
+
+5. **Escaneie o QR Code** que aparecerá no terminal com seu WhatsApp
+
+## ⚙️ Configuração
+
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+
+```env
+# OpenAI API
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Google Gemini API
+GOOGLE_API_KEY=your_google_api_key_here
+
+# Sistema (opcional)
+USE_NEW_ENGINE=true              # true = v2.0, false = legacy
+DEBUG_DISPATCHER=false           # Ativar logs de debug
+NODE_ENV=production              # production ou development
+
+# Voice Intelligence (opcional)
+# Configurações adicionais para controle de voz
+```
+
+### Variáveis Importantes
+
+| Variável | Descrição | Padrão | Obrigatória |
+|----------|-----------|--------|-------------|
+| `OPENAI_API_KEY` | Chave da API OpenAI (GPT, Whisper, TTS, DALL-E) | - | ✅ Sim |
+| `GOOGLE_API_KEY` | Chave da API Google (Gemini) | - | ✅ Sim |
+| `USE_NEW_ENGINE` | Usar engine v2.0 (true) ou legacy (false) | `true` | ❌ Não |
+| `DEBUG_DISPATCHER` | Ativar logs detalhados | `false` | ❌ Não |
+
+## 🚀 Uso
+
+### Iniciar o Bot
+
+```bash
+# Produção
+node index.js
+
+# Com Docker Compose (se disponível)
+docker-compose up -d
+```
+
+### Primeira Execução
+
+1. Execute `node index.js`
+2. Aguarde o QR Code aparecer no terminal
+3. Abra o WhatsApp no seu celular
+4. Vá em **Aparelhos conectados** > **Conectar um aparelho**
+5. Escaneie o QR Code
+6. Aguarde a mensagem "✅ Client is ready!"
+
+### Comandos do Bot
+
+O bot responde naturalmente a conversas. Alguns exemplos de interação:
+
+- **Saudações**: "Oi", "Olá", "E aí"
+- **Perguntas**: Faça perguntas sobre marketing digital, redes sociais, consultoria
+- **Solicitações de conteúdo**: "Me cria uma imagem de...", "Pode fazer um áudio explicando..."
+- **Consultas**: "Quero fazer uma consultoria"
+- **Áudio**: Envie mensagens de voz (o bot transcreve e responde adaptivamente)
+
+### Tags Especiais (para desenvolvedores)
+
+O bot processa tags especiais nas respostas da IA:
+
+- `||SAVE|| {json}`: Extrai e salva dados do cliente
+- `||GENERATE_IMAGE: prompt||`: Gera uma imagem
+- `||SEND_AUDIO: text||`: Gera áudio TTS
+- `<REACT:emoji>`: Envia reação do WhatsApp
+- `<SPLIT>`: Fragmenta mensagens para entrega natural
+
+## 🧪 Testes
+
+O projeto inclui vários arquivos de teste para validar funcionalidades:
+
+```bash
+# Teste básico do bot
+node tests/test_bot.js
+
+# Teste de humanização
+node tests/test_humanization.js
+
+# Teste de onboarding
+node tests/test_onboarding.js
+
+# Teste de estratégia
+node tests/test_strategy.js
+
+# Teste end-to-end
+node tests/test_end_to_end.js
+```
+
+### Estrutura dos Testes
+
+Os testes usam mocks do WhatsApp Web.js para simular conversas:
+
+```javascript
+const { handleMessage } = require('./src/commandDispatcher');
+
+const mockMessage = createMockMessage("Olá!", "5511999999999@c.us");
+await handleMessage(mockMessage);
+```
+
+## 📁 Estrutura do Projeto
+
+```
+aad-bot/
+├── src/                                    # Código fonte
+│   ├── ai/                                 # Serviços de IA (dual-mode)
+│   │   ├── conversationOrchestrator.js     # v2.0: Orquestrador mestre
+│   │   ├── conversationalEngine.js         # v2.0: StateGraph + intent + emotion
+│   │   ├── semanticMemory.js               # v2.0: Memória de longo prazo
+│   │   ├── aiService.js                    # Legacy: RAG + LLM + FSM
+│   │   ├── vectorStore.js                  # Legacy: Base de conhecimento
+│   │   └── history.js                      # Legacy: Gerenciador de histórico
+│   ├── services/                           # Serviços de domínio
+│   │   ├── clientService.js                # Persistência de dados de clientes
+│   │   ├── mediaService.js                 # Geração de imagem/áudio + visão
+│   │   └── voiceIntelligence.js            # Transcrição + análise + TTS
+│   ├── data/                               # Dados e configurações
+│   │   └── knowledgeBase.js                # Dados de treinamento RAG
+│   ├── doug/                               # Definições de persona Doug
+│   │   ├── constitution.js                 # Regras de personalidade
+│   │   └── knowledge.js                    # Conhecimento de domínio
+│   ├── commandDispatcher.js                # Roteador dual-mode + buffer
+│   ├── conversationState.js                # Legacy: FSM
+│   └── personas.js                         # Prompts de personas
+├── docs/                                   # Documentação
+│   ├── doug/                               # Documentação do sistema Doug
+│   │   ├── CORE_CONSTITUTION_v20250520.md
+│   │   ├── DougPlaybook.md
+│   │   ├── Doug_Actions_FINAL.md
+│   │   ├── Doug_Expression_FINAL.md
+│   │   ├── PILAR 1_ NARRATIVA.md
+│   │   ├── PILAR 2_ PRESENÇA.md
+│   │   └── PILAR 3_ MONETIZAÇÃO.md
+│   └── CLAUDE.md                           # Documentação técnica para Claude
+├── tests/                                  # Arquivos de teste
+│   ├── test_bot.js
+│   ├── test_humanization.js
+│   ├── test_onboarding.js
+│   ├── test_strategy.js
+│   └── test_end_to_end.js
+├── index.js                                # Ponto de entrada principal
+├── package.json                            # Dependências e scripts
+├── docker-compose.yml                      # Configuração Docker (opcional)
+├── .gitignore                              # Arquivos ignorados pelo Git
+└── README.md                               # Este arquivo
+```
+
+### Diretórios Principais
+
+- **`src/ai/`**: Núcleo da inteligência conversacional com arquitetura dual-mode
+- **`src/services/`**: Serviços auxiliares (voz, mídia, clientes)
+- **`src/doug/`**: Definições da persona "Doug" (personalidade, conhecimento)
+- **`docs/`**: Documentação completa do sistema
+- **`tests/`**: Testes funcionais e de integração
+
+## 📚 Documentação Adicional
+
+Para mais detalhes técnicos, consulte:
+
+- **[docs/CLAUDE.md](docs/CLAUDE.md)**: Documentação técnica completa da arquitetura
+- **[docs/doug/](docs/doug/)**: Sistema Doug completo (narrativa, presença, monetização)
+  - [DougPlaybook.md](docs/doug/DougPlaybook.md): Guia de uso do Doug
+  - [Doug_Actions_FINAL.md](docs/doug/Doug_Actions_FINAL.md): Ações e comandos
+  - [Doug_Expression_FINAL.md](docs/doug/Doug_Expression_FINAL.md): Sistema de expressão
+  - [PILAR 1_ NARRATIVA.md](docs/doug/PILAR%201_%20NARRATIVA.md): Narrativa do Doug
+  - [PILAR 2_ PRESENÇA.md](docs/doug/PILAR%202_%20PRESENÇA.md): Estratégia de presença
+  - [PILAR 3_ MONETIZAÇÃO.md](docs/doug/PILAR%203_%20MONETIZAÇÃO.md): Estratégia de monetização
 
 ## 🛠️ Tecnologias
-- [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js)
-- [LangChain](https://js.langchain.com/)
-- [OpenAI / Gemini](https://openai.com/)
-- [Docker](https://www.docker.com/)
+
+### Core
+
+- **[Node.js](https://nodejs.org/)**: Runtime JavaScript
+- **[whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js)**: Interface WhatsApp Web
+- **[Puppeteer](https://pptr.dev/)**: Automação de browser (usado pelo whatsapp-web.js)
+
+### AI & ML
+
+- **[LangChain](https://js.langchain.com/)**: Framework para aplicações com LLM
+- **[@langchain/openai](https://www.npmjs.com/package/@langchain/openai)**: Integração OpenAI (GPT, Whisper, DALL-E)
+- **[@langchain/google-genai](https://www.npmjs.com/package/@langchain/google-genai)**: Integração Google Gemini
+- **[@langchain/community](https://www.npmjs.com/package/@langchain/community)**: Ferramentas da comunidade LangChain
+
+### Utilities
+
+- **[dotenv](https://www.npmjs.com/package/dotenv)**: Gerenciamento de variáveis de ambiente
+- **[qrcode-terminal](https://www.npmjs.com/package/qrcode-terminal)**: Geração de QR Code no terminal
+
+## 🔧 Desenvolvimento
+
+### Convenções de Código
+
+- **Imports**: CommonJS (`require`), não ES6 modules
+- **Lazy Loading**: Módulos dependentes de API carregados sob demanda
+- **Services**: Padrão Singleton (`module.exports = new ClassName()`)
+- **State Management**: Maps em memória para estado e histórico de chat
+- **Organização**: Diretórios baseados em features (ai/, services/, data/)
+
+### Padrões Arquiteturais
+
+1. **Dual-Mode System**: Toggle entre v2.0 e legacy via `USE_NEW_ENGINE`
+2. **Message Buffering**: 3.5s timeout para combinar mensagens rápidas
+3. **Response Formatting**: Fragmentação automática com timing humanizado
+4. **Semantic Memory**: Store/retrieve baseado em vetores com consolidação
+5. **Intent Detection**: Pattern-based com confidence scores
+6. **Emotional Intelligence**: Modelo valence/arousal com 9 emoções
+
+### Alternar Entre Sistemas
+
+```bash
+# Usar v2.0 (padrão)
+USE_NEW_ENGINE=true node index.js
+
+# Usar sistema legacy
+USE_NEW_ENGINE=false node index.js
+```
+
+## 📄 Licença
+
+ISC
+
+## 👤 Autor
+
+**Saraiva**
+
+---
+
+<div align="center">
+
+**Feito com ❤️ e muita ☕**
+
+</div>

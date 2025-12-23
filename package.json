@@ -1,13 +1,30 @@
 {
   "name": "aad",
   "version": "1.0.0",
-  "description": "",
+  "description": "WhatsApp bot com inteligência conversacional avançada - AI-powered conversational intelligence with semantic memory, intent detection, emotional intelligence, and multi-persona system",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "test": "node tests/test_bot.js",
+    "test:humanization": "node tests/test_humanization.js",
+    "test:onboarding": "node tests/test_onboarding.js",
+    "test:strategy": "node tests/test_strategy.js",
+    "test:e2e": "node tests/test_end_to_end.js",
+    "test:all": "node tests/test_bot.js && node tests/test_humanization.js && node tests/test_onboarding.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "ai",
+    "chatbot",
+    "langchain",
+    "openai",
+    "gemini",
+    "conversational-ai",
+    "semantic-memory",
+    "emotional-intelligence"
+  ],
+  "author": "Saraiva",
   "license": "ISC",
   "dependencies": {
     "@langchain/community": "^1.1.1",
