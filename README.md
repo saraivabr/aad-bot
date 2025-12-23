@@ -62,6 +62,35 @@ AAD é um bot inteligente para WhatsApp com capacidades avançadas de conversaç
 - **Client Service**: Persistência de dados de clientes
 - **Suporte a Mídia**: Processamento de áudio, imagens e stickers
 
+### 🆕 Enhanced Architecture (NEW!)
+
+Camada adicional de inteligência emocional e memória persistente:
+
+- **🎭 Emotion Handler**: Análise emocional aprimorada usando GPT-4o-mini (9 emoções + intensidade)
+- **💾 Hybrid Memory System**: Redis (cache rápido 24h) + Postgres (persistência longa)
+- **⏱️ Smart Delays**: Delays adaptativos baseados em comprimento de mensagem e emoção
+- **📝 Data Extractors**: Extração automática de dados estruturados (nome, negócio, localização)
+- **🔧 Service Layer**: Wrappers centralizados para OpenAI, Redis e Postgres
+- **🐳 Docker Ready**: docker-compose.yml completo com health checks
+- **⚙️ PM2 Support**: Configuração de produção com logs e auto-restart
+
+**Quick Start:**
+```bash
+# Inicie os bancos de dados
+docker-compose up -d postgres redis
+
+# Teste as novas features
+npm run test:enhanced
+
+# Use PM2 em produção
+npm run start:pm2
+```
+
+📖 **Documentação:**
+- [Enhanced Architecture Guide](docs/ENHANCED_ARCHITECTURE.md) - Documentação completa
+- [Quick Start Guide](docs/QUICK_START.md) - Guia rápido de início
+- [Integration Examples](docs/INTEGRATION_EXAMPLES.js) - Exemplos de integração
+
 ## 🏗️ Arquitetura
 
 ### Fluxo v2.0 (Padrão)
@@ -170,6 +199,10 @@ USE_NEW_ENGINE=true              # true = v2.0, false = legacy
 DEBUG_DISPATCHER=false           # Ativar logs de debug
 NODE_ENV=production              # production ou development
 
+# Database Configuration (Enhanced Architecture)
+REDIS_URL=redis://localhost:6379
+POSTGRES_URL=postgresql://ai_bot:securepass@localhost:5432/aibotdb
+
 # Voice Intelligence (opcional)
 # Configurações adicionais para controle de voz
 ```
@@ -182,17 +215,30 @@ NODE_ENV=production              # production ou development
 | `GOOGLE_API_KEY` | Chave da API Google (Gemini) | - | ✅ Sim |
 | `USE_NEW_ENGINE` | Usar engine v2.0 (true) ou legacy (false) | `true` | ❌ Não |
 | `DEBUG_DISPATCHER` | Ativar logs detalhados | `false` | ❌ Não |
+| `REDIS_URL` | URL de conexão Redis | `redis://localhost:6379` | ❌ Não |
+| `POSTGRES_URL` | URL de conexão Postgres | `postgresql://ai_bot:...` | ❌ Não |
+
+**Nota:** Se `REDIS_URL` ou `POSTGRES_URL` não estiverem configurados, o sistema faz fallback automático para armazenamento em arquivo JSON.
 
 ## 🚀 Uso
 
 ### Iniciar o Bot
 
 ```bash
-# Produção
-node index.js
+# Desenvolvimento
+npm start
 
-# Com Docker Compose (se disponível)
-docker-compose up -d
+# Com PM2 (Produção recomendada)
+npm run start:pm2
+
+# Monitorar com PM2
+pm2 monit
+
+# Ver logs com PM2
+npm run logs:pm2
+
+# Iniciar bancos de dados (opcional)
+npm run docker:up
 ```
 
 ### Primeira Execução
@@ -230,18 +276,54 @@ O projeto inclui vários arquivos de teste para validar funcionalidades:
 
 ```bash
 # Teste básico do bot
-node tests/test_bot.js
+npm test
 
 # Teste de humanização
-node tests/test_humanization.js
+npm run test:humanization
 
 # Teste de onboarding
-node tests/test_onboarding.js
+npm run test:onboarding
 
 # Teste de estratégia
-node tests/test_strategy.js
+npm run test:strategy
 
 # Teste end-to-end
+npm run test:e2e
+
+# 🆕 Teste da arquitetura enhanced (NEW!)
+npm run test:enhanced
+
+# Todos os testes
+npm run test:all
+```
+
+### Teste da Enhanced Architecture
+
+O novo teste `test:enhanced` valida:
+- ✅ Conexões com Redis e Postgres
+- ✅ Análise de emoções
+- ✅ Extração de dados estruturados
+- ✅ Sistema de memória híbrida
+- ✅ Processamento de mensagens
+- ✅ Smart delays
+- ✅ Construção de contexto para IA
+
+**Exemplo de saída:**
+```
+🧪 Testing Enhanced Architecture Integration
+
+═══════════════════════════════════════════════════════
+1️⃣  TESTING SERVICE AVAILABILITY
+═══════════════════════════════════════════════════════
+
+📡 Testing Redis connection...
+   ✅ Redis: Connected
+
+📡 Testing Postgres connection...
+   ✅ Postgres: Connected
+```
+
+### Estrutura dos Testes
 node tests/test_end_to_end.js
 ```
 
@@ -268,10 +350,22 @@ aad-bot/
 │   │   ├── aiService.js                    # Legacy: RAG + LLM + FSM
 │   │   ├── vectorStore.js                  # Legacy: Base de conhecimento
 │   │   └── history.js                      # Legacy: Gerenciador de histórico
+│   ├── 🆕 handlers/                        # 🆕 Enhanced Architecture: Handlers
+│   │   ├── emotionHandler.js               # 🆕 Análise emocional com GPT-4o-mini
+│   │   ├── memoryHandler.js                # 🆕 Sistema de memória Redis + Postgres
+│   │   └── messageHandler.js               # 🆕 Processamento central de mensagens
 │   ├── services/                           # Serviços de domínio
 │   │   ├── clientService.js                # Persistência de dados de clientes
 │   │   ├── mediaService.js                 # Geração de imagem/áudio + visão
-│   │   └── voiceIntelligence.js            # Transcrição + análise + TTS
+│   │   ├── voiceIntelligence.js            # Transcrição + análise + TTS
+│   │   ├── 🆕 openaiService.js             # 🆕 Wrapper centralizado OpenAI
+│   │   ├── 🆕 redisService.js              # 🆕 Cliente Redis centralizado
+│   │   └── 🆕 pgService.js                 # 🆕 Cliente Postgres centralizado
+│   ├── 🆕 utils/                           # 🆕 Enhanced Architecture: Utilitários
+│   │   ├── delay.js                        # 🆕 Smart delays com emoção
+│   │   └── regexExtractors.js              # 🆕 Extração de dados estruturados
+│   ├── 🆕 persona/                         # 🆕 Definições de personas (modular)
+│   │   └── personas.js                     # 🆕 Prompts de personas
 │   ├── data/                               # Dados e configurações
 │   │   └── knowledgeBase.js                # Dados de treinamento RAG
 │   ├── doug/                               # Definições de persona Doug
@@ -279,7 +373,7 @@ aad-bot/
 │   │   └── knowledge.js                    # Conhecimento de domínio
 │   ├── commandDispatcher.js                # Roteador dual-mode + buffer
 │   ├── conversationState.js                # Legacy: FSM
-│   └── personas.js                         # Prompts de personas
+│   └── personas.js                         # Prompts de personas (legacy)
 ├── docs/                                   # Documentação
 │   ├── doug/                               # Documentação do sistema Doug
 │   │   ├── CORE_CONSTITUTION_v20250520.md
@@ -289,16 +383,24 @@ aad-bot/
 │   │   ├── PILAR 1_ NARRATIVA.md
 │   │   ├── PILAR 2_ PRESENÇA.md
 │   │   └── PILAR 3_ MONETIZAÇÃO.md
-│   └── CLAUDE.md                           # Documentação técnica para Claude
+│   ├── CLAUDE.md                           # Documentação técnica para Claude
+│   ├── 🆕 ENHANCED_ARCHITECTURE.md         # 🆕 Guia completo da arquitetura enhanced
+│   ├── 🆕 QUICK_START.md                   # 🆕 Guia rápido de início
+│   └── 🆕 INTEGRATION_EXAMPLES.js          # 🆕 Exemplos de integração
 ├── tests/                                  # Arquivos de teste
 │   ├── test_bot.js
 │   ├── test_humanization.js
 │   ├── test_onboarding.js
 │   ├── test_strategy.js
-│   └── test_end_to_end.js
+│   ├── test_end_to_end.js
+│   └── 🆕 test_enhanced_architecture.js    # 🆕 Testes da enhanced architecture
+├── 🆕 logs/                                # 🆕 Logs do PM2
 ├── index.js                                # Ponto de entrada principal
 ├── package.json                            # Dependências e scripts
-├── docker-compose.yml                      # Configuração Docker (opcional)
+├── 🆕 ecosystem.config.js                  # 🆕 Configuração PM2
+├── 🆕 Dockerfile                           # 🆕 Container Docker
+├── docker-compose.yml                      # 🆕 Atualizado com Postgres + Redis
+├── 🆕 .env.example                         # 🆕 Exemplo de variáveis de ambiente
 ├── .gitignore                              # Arquivos ignorados pelo Git
 └── README.md                               # Este arquivo
 ```
@@ -306,10 +408,12 @@ aad-bot/
 ### Diretórios Principais
 
 - **`src/ai/`**: Núcleo da inteligência conversacional com arquitetura dual-mode
-- **`src/services/`**: Serviços auxiliares (voz, mídia, clientes)
+- **🆕 `src/handlers/`**: 🆕 Handlers da enhanced architecture (emotion, memory, message)
+- **`src/services/`**: Serviços auxiliares (voz, mídia, clientes, 🆕 Redis, 🆕 Postgres)
+- **🆕 `src/utils/`**: 🆕 Utilitários (smart delays, data extraction)
 - **`src/doug/`**: Definições da persona "Doug" (personalidade, conhecimento)
-- **`docs/`**: Documentação completa do sistema
-- **`tests/`**: Testes funcionais e de integração
+- **`docs/`**: Documentação completa do sistema (🆕 + guias enhanced architecture)
+- **`tests/`**: Testes funcionais e de integração (🆕 + test_enhanced_architecture.js)
 
 ## 📚 Documentação Adicional
 
@@ -343,6 +447,14 @@ Para mais detalhes técnicos, consulte:
 
 - **[dotenv](https://www.npmjs.com/package/dotenv)**: Gerenciamento de variáveis de ambiente
 - **[qrcode-terminal](https://www.npmjs.com/package/qrcode-terminal)**: Geração de QR Code no terminal
+
+### 🆕 Enhanced Architecture Stack
+
+- **[ioredis](https://www.npmjs.com/package/ioredis)**: Cliente Redis de alta performance
+- **[pg](https://www.npmjs.com/package/pg)**: Cliente PostgreSQL para Node.js
+- **[pm2](https://www.npmjs.com/package/pm2)**: Gerenciador de processos avançado
+- **[Docker](https://www.docker.com/)**: Containerização (Postgres 16 + Redis 7)
+- **[Redis Commander](https://github.com/joeferner/redis-commander)**: Interface web para Redis
 
 ## 🔧 Desenvolvimento
 
